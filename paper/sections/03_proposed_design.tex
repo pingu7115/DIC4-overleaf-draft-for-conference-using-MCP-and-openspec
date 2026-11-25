@@ -18,29 +18,28 @@ To satisfy both low miss rates and verifiable human-in-the-loop oversight, we de
 \centering
 \resizebox{\columnwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=0.55cm and 0.45cm,
-    box/.style={draw, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt, minimum width=1.9cm, minimum height=0.65cm},
-    db/.style={draw, cylinder, shape border rotate=90, aspect=0.25, align=center, font=\scriptsize, inner sep=2pt, minimum width=1.5cm}
+    node distance=0.7cm and 0.45cm,
+    box/.style={draw, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt, minimum width=1.95cm, minimum height=0.65cm}
 ]
 \node[box] (user) {1. User\\SOC Analyst};
 \node[box, right=of user] (query) {2. Query\\TriageRequest};
 \node[box, right=of query] (planner) {3. Planner\\LLM ReAct};
 
-\node[box, below=of query] (data) {4. Data Retr.\\DuckDB / SQL};
-\node[box, below=of planner] (analytics) {5. Analytics\\GBDT + SHAP};
-\node[box, right=of analytics] (kb) {6. Domain KB\\ATT\&CK + Rules};
+\node[box, below=of user] (data) {4. Data Retr.\\DuckDB / SQL};
+\node[box, below=of query] (analytics) {5. Analytics\\GBDT + SHAP};
+\node[box, below=of planner] (kb) {6. Domain KB\\ATT\&CK + Rules};
 
-\node[box, below=of data] (decision) {7. Decision\\FuseEvidence};
-\node[box, right=of decision] (output) {8. Output\\Audit Report};
+\node[box, below=of kb] (decision) {7. Decision\\FuseEvidence};
+\node[box, below=of data] (output) {8. Output\\Audit Report};
 
 \draw[-{Stealth[scale=0.8]}] (user) -- (query);
 \draw[-{Stealth[scale=0.8]}] (query) -- (planner);
-\draw[<->, >={Stealth[scale=0.8]}] (planner) -- (data);
-\draw[<->, >={Stealth[scale=0.8]}] (planner) -- (analytics);
-\draw[<->, >={Stealth[scale=0.8]}] (planner) -- (kb);
-\draw[-{Stealth[scale=0.8]}] (planner.south) |- (decision.east);
+\draw[<->, >={Stealth[scale=0.8]}] (planner.south west) -- (data.north east);
+\draw[<->, >={Stealth[scale=0.8]}] (planner.south) -- (analytics.north);
+\draw[<->, >={Stealth[scale=0.8]}] (planner.south) -- (kb.north);
+\draw[-{Stealth[scale=0.8]}] (planner.east) -- ++(0.32,0) |- (decision.east);
 \draw[-{Stealth[scale=0.8]}] (decision) -- (output);
-\draw[-{Stealth[scale=0.8]}, dashed] (output.south) -- ++(0,-0.25) -| (user.south);
+\draw[-{Stealth[scale=0.8]}, dashed] (output.west) -- ++(-0.32,0) |- (user.west);
 \end{tikzpicture}%
 }
 \caption{Eight-module architecture of the AI SOC Analyst Agent.}
