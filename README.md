@@ -1,4 +1,26 @@
-# AI SOC Analyst Agent — DIC3 Project Proposal Refactor using OpenSpec
+# AI SOC Analyst Agent — DIC4: Overleaf Draft for IEEE Conference using MCP & OpenSpec
+
+> **AIoT 課程作業**：DIC4 — Overleaf Draft for IEEE Conference using MCP and OpenSpec  
+> **學生／提交者**：蕭宥瑄（基於 [DIC3 OpenSpec 重構倉儲](https://github.com/pingu7115/DIC3-Project-Proposal-Refactor-using-Openspec) 獨立延伸，不更動原小組與 DIC3 倉儲）  
+> **專案主題**：AI SOC Analyst Agent（第 16 組：蘇恩平、周妤、袁靖淇、蕭宥瑄）
+
+---
+
+## DIC4 繳交項目快速導覽
+
+| 項目 | 說明 | 連結 / 位置 |
+|---|---|---|
+| **修正後完整 PDF（好版本）** | IEEEtran 雙欄會議格式、完整 A–F / A2Z 結構、0 錯誤 / 0 警告 / 0 溢出 | [`paper/paper_good.pdf`](paper/paper_good.pdf)（[Overleaf 專案](https://www.overleaf.com/project/6b067376cdb12bbb4e606f4d)） |
+| **修改前有誤 PDF（壞版本）** | 保留初版 Table II 超出右欄邊界裁切（`50.55pt`）與段落溢出（`8.98pt`）問題 | [`paper_bad/paper_bad.pdf`](paper_bad/paper_bad.pdf)（[Overleaf 專案](https://www.overleaf.com/project/6b06735bfa00a981397a3448)） |
+| **錯誤檢查與修正報告** | 記錄 Agent 檢視 Overleaf `output.log` 發現之溢出錯誤與修復對照 | [`docs/05-error-audit-report.md`](docs/05-error-audit-report.md) |
+| **IEEE Conference LaTeX 原始碼** | 主檔、作者、26 篇 IEEE 參考文獻、Checkpoints A–F 摘要與各章節 | [`paper/`](paper/) |
+| **OpenSpec 規格驅動結構** | `000-abstract` ～ `006-reference`（各含 `proposal.md`、`design.md`、`tasks.md`），`openspec validate --all` 9/9 通過 | [`openspec/changes/`](openspec/changes/) |
+| **Overleaf MCP 工具** | 透過 `netique/overleaf-mcp` 連線 Overleaf 同步檔案、觸發雲端編譯與取得日誌 | [`netique/overleaf-mcp`](https://github.com/netique/overleaf-mcp) |
+| **A2Z & IEEE 檢核基準** | A2Z 26 字母映射表與 IEEEtran 格式檢查清單 | [`myRef/`](myRef/) |
+
+---
+
+## 原始專題背景（DIC3 基礎）
 
 結合 **ML 告警分級**、**MITRE ATT&CK 領域知識** 與 **LLM 推理** 的資安維運中心（SOC）智慧代理人系統。
 Agent 針對資安事件提供 TP / BP / FP 分級、ATT&CK 攻擊鏈對應與處置建議，每個結論皆具備可追溯之證據鏈；當信心不足、結論衝突、高風險或證據不足時，主動升級交由分析師複核。
