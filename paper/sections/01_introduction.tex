@@ -1,0 +1,25 @@
+\section{Introduction}
+
+%% A2Z G: General Background
+Enterprise Security Operations Centers (SOCs) are the front line of defense against increasingly persistent cyber threats. Recent threat intelligence reports underscore the escalating operational pressure: Taiwan's National Security Bureau (NSB) documented an average of 2.63 million daily cyber intrusions targeting critical infrastructure in 2025 (+6\% year-over-year)~\cite{nsb2025}, while IBM's 2026 Cost of a Data Breach Report places the global average breach cost at a record \$4.99 million with a 247-day mean containment lifecycle~\cite{ibm2026}. Furthermore, Mandiant's M-Trends 2026 reports a median attacker dwell time of 14 days (and 122 days for espionage campaigns)~\cite{mandiant2026}. Modern SOCs ingest tens of thousands of heterogeneous alerts daily across endpoint detection and response (EDR), network telemetry, and identity logs, yet true positive (TP) malicious intrusions account for fewer than 5\% of total volume~\cite{wei2025,alahmadi2022}.
+
+%% A2Z H: However / Core Bottlenecks
+However, this severe signal-to-noise imbalance induces widespread \emph{alert fatigue}, causing Tier-1 analysts to miss genuine multi-stage attacks buried under benign positive (BP) and false positive (FP) triggers~\cite{ndichu2026,alahmadi2022}. Existing automated triage approaches exhibit two structural limitations:
+\begin{itemize}
+    \item \textbf{Pure Statistical ML}: Gradient-boosted classifiers~\cite{freitas2024,freitas2026} process tabular alert features rapidly with calibrated probabilities, but evaluate alerts in isolation without capturing causal kill-chain progression or semantic log context.
+    \item \textbf{Autonomous LLM Agents}: Recent tool-using LLM agents~\cite{wei2025,tsegai2026} reason over logs, yet empirical benchmarks reveal miss rates of at least 40.4\%~\cite{tsegai2026} and a tendency to close investigations prematurely when enterprise telemetry logs are missing. Moreover, opaque automation risks inducing \emph{automation complacency} among human analysts~\cite{tilbury2026}.
+\end{itemize}
+
+%% A2Z I & J: In Literature & Judgement
+While kill-chain graph correlation~\cite{sadlek2025,garcia2025} and retrieval-augmented threat intelligence annotation~\cite{lekssays2025} address parts of this gap, no existing framework unifies calibrated statistical triage, deterministic domain guardrails, and uncertainty-aware human escalation.
+
+%% A2Z K: Keypoint / 5 Cores & Contributions
+To bridge this gap, we propose the \textbf{AI SOC Analyst Agent}, grounded in five domain principles (\emph{5 Cores}): (M1) \emph{Assume Breach} (missing logs trigger expanded queries or escalation rather than benign closure); (M2) \emph{Incident- and Kill-Chain-Centric Analysis}; (M3) \emph{Asymmetric Error Cost} (prioritizing TP miss-rate minimization); (M4) \emph{TTPs over IOCs} via MITRE ATT\&CK~\cite{strom2020,bianco2014}; and (M5) \emph{Verifiable Automation with Human Final Judgment}~\cite{nist2025}. Our key contributions are:
+\begin{enumerate}
+    \item A modular eight-component hybrid architecture integrating LightGBM+SHAP, Chroma-backed MITRE ATT\&CK/NIST RAG, and a bounded ReAct LLM planner.
+    \item Formalized evidence fusion and safety-relabeling algorithms (Algorithms~\ref{alg:triage} and~\ref{alg:fusion}) enforcing deterministic high-risk rules (R1--R5) and rule-based sufficiency checks.
+    \item A leak-free, dual-benchmark evaluation protocol across Microsoft GUIDE~\cite{freitas2024} and ExCyTIn-Bench~\cite{wu2026}.
+\end{enumerate}
+
+%% A2Z L: List the organization
+The remainder of this paper is organized as follows: Section~II reviews related work; Section~III details the proposed architecture and algorithms; Section~IV presents the evaluation plan; and Section~V concludes with future directions.

@@ -1,0 +1,36 @@
+\section{Related Work}
+
+%% A2Z M: Methods in Literature (1:1 AI + Domain balance)
+Prior research on automated SOC triage spans four complementary streams, balancing AI methodology and cybersecurity domain knowledge:
+
+\subsection{Statistical ML and Alert Prioritization}
+Freitas et al.~\cite{freitas2024,freitas2026} demonstrate that gradient-boosted decision trees (GBDTs) trained on Microsoft GUIDE achieve high-throughput TP/BP/FP triage with well-calibrated posteriors. However, purely statistical models struggle with novel attack patterns and lack natural-language investigative traceability~\cite{sommer2010}.
+
+\subsection{LLM-Based Autonomous SOC Agents}
+Multi-agent LLM frameworks such as CORTEX~\cite{wei2025} and longitudinal deployments~\cite{banstola2026} automate multi-step alert investigation. Nonetheless, Tsegai et al.~\cite{tsegai2026} expose critical failure modes—including a minimum 40.4\% miss rate across five tool-using LLM strategies and premature benign closure when logs are absent. Standardized benchmarks such as ExCyTIn-Bench~\cite{wu2026} and CyberSOCEval~\cite{deason2025} further highlight the need for verifiable multi-step reasoning~\cite{habibzadeh2025}.
+
+\subsection{Domain Knowledge, Attack Graphs, and Human Factors}
+Kill-chain graph methods (Sadlek et al.~\cite{sadlek2025}, ROSCA~\cite{garcia2025}) aggregate alerts along MITRE ATT\&CK tactics~\cite{strom2020}, while TechniqueRAG~\cite{lekssays2025} improves technique grounding via retrieval-augmented generation. On the human-factors side, field studies~\cite{alahmadi2022,kersten2025} and vigilance research~\cite{tilbury2025,tilbury2026} warn that uncalibrated automation erodes analyst critical oversight, motivating NIST SP 800-61 Rev.~3~\cite{nist2025} and Zero Trust~\cite{nist2020} escalation workflows.
+
+%% A2Z O: Organize (Article Summary Table)
+\begin{table*}[t]
+\centering
+\caption{Comparison of Representative SOC Triage Approaches and Identified Research Gaps}
+\label{tab:related_work}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{Study} & \textbf{Year} & \textbf{AI Method} & \textbf{Domain Knowledge} & \textbf{Dataset} & \textbf{Key Limitation} \\
+\midrule
+Freitas et al.~\cite{freitas2024} & 2024 & GBDT (LightGBM) & Alert/Incident schema & GUIDE & No multi-step log reasoning \\
+CORTEX~\cite{wei2025} & 2025 & Multi-agent LLM & SOC playbooks & Enterprise & High token cost ($\sim$24k/alert) \\
+Tsegai et al.~\cite{tsegai2026} & 2026 & Tool-using LLM & ReAct investigation & Benchmark & $\ge$40.4\% miss rate; early closure \\
+ROSCA~\cite{garcia2025} & 2025 & Graph correlation & MITRE ATT\&CK & Alert logs & Lacks LLM narrative \\
+TechniqueRAG~\cite{lekssays2025} & 2025 & RAG + LLM & ATT\&CK STIX & CTI text & Annotation only, no triage \\
+Tilbury et al.~\cite{tilbury2026} & 2026 & Human-AI study & SOC vigilance & Field study & Automation complacency risk \\
+\textbf{Ours (Proposed)} & \textbf{2026} & \textbf{GBDT + SHAP + LLM} & \textbf{ATT\&CK + NIST + R1--R5} & \textbf{GUIDE + ExCyTIn} & \textbf{Proposal stage (planned)} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+%% A2Z N: New Proposed / Research Gap
+As summarized in Table~\ref{tab:related_work}, existing work treats statistical ML, LLM reasoning, and deterministic domain guardrails separately. Our proposed framework bridges this research gap by fusing calibrated GBDT posteriors with ATT\&CK-constrained LLM reasoning and proactive escalation.
