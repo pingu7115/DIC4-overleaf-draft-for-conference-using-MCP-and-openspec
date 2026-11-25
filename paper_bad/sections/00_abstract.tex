@@ -1,0 +1,18 @@
+\begin{abstract}
+%% Checkpoint A: Attention Getter
+Modern security operations centers (SOCs) face unprecedented operational strain driven by relentless cyberattacks, stealthy persistent adversaries, and escalating data breach damages. First-line security analysts are routinely overwhelmed by tens of thousands of heterogeneous daily alerts, where true malicious intrusions represent a negligible fraction below five percent, resulting in pervasive alert fatigue, cognitive overload, and delayed incident containment.
+%% Checkpoint B: But / Challenge
+Existing statistical machine learning approaches classify alerts as isolated tabular feature vectors without capturing holistic multi-stage attack chain causal progression. Conversely, emerging large language model (LLM) autonomous agents suffer from unacceptably high miss rates exceeding forty percent and frequently close investigations prematurely when enterprise telemetry logs are missing.
+%% Checkpoint C: Cure
+To resolve these structural vulnerabilities, this paper proposes the AI SOC Analyst Agent, an evidence-grounded and escalation-aware hybrid framework for automated security incident triage. The proposed system synthesizes gradient-boosted decision tree (GBDT) statistical modeling with structured MITRE ATT\&CK domain knowledge and multi-step LLM reasoning.
+%% Checkpoint D: Development
+Within this architecture, the GBDT classifier delivers rapid, calibrated posterior probability distributions over true positive, benign positive, and false positive categories accompanied by SHAP feature attributions. An evidence fusion engine dynamically enforces deterministic kill-chain high-risk rules and operationalizes the Assume Breach paradigm, proactively escalating ambiguous, conflicting, log-deficient, or high-risk incidents for human expert verification.
+%% Checkpoint E: Experiments
+To ensure rigorous, reproducible, and leak-free assessment, the framework is designed to be evaluated across two distinct public benchmarks: Microsoft GUIDE for large-scale real-world incident classification and ExCyTIn-Bench for multi-step SQL log investigation, benchmarked against majority voting, historical heuristic rules, standalone GBDT classifiers, and unaugmented LLMs.
+%% Checkpoint F: Findings / Expected Outcomes (Proposal stage — no fabricated metrics)
+The proposed design is expected to characterize the Pareto trade-off frontier between true-positive miss rate and human escalation rate, achieving lower miss rates than standalone baselines while improving triage verifiability, attack technique mapping, and protection against automation complacency.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Alert fatigue, evidence fusion, human-in-the-loop, incident triage, large language models, MITRE ATT\&CK, security operations center.
+\end{IEEEkeywords}

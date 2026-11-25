@@ -1,0 +1,30 @@
+\section{Evaluation Plan}
+
+%% A2Z Q-S: Quality, Related Methods, Simulation Setup
+In accordance with proposal-stage academic integrity, no experimental results are fabricated; this section specifies our planned evaluation protocol across two complementary benchmarks:
+\begin{itemize}
+    \item \textbf{Microsoft GUIDE}~\cite{freitas2024}: Approximately 1M labeled incidents (707k training incidents: 20.6\% TP, 49.0\% BP, 30.4\% FP; 432 ATT\&CK techniques). To prevent data leakage~\cite{arp2022,engelen2021}, splits are strictly grouped by incident ID, organization, and time.
+    \item \textbf{ExCyTIn-Bench}~\cite{wu2026}: 57 SQL telemetry tables across 8 real attack chains for evaluating multi-step SQL investigation.
+\end{itemize}
+
+\begin{table}[t]
+\centering
+\caption{Planned Evaluation Matrix (E1--E5 and Ablation)}
+\label{tab:eval_plan}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Exp.} & \textbf{Baselines} & \textbf{Primary Metrics} \\
+\midrule
+E1 Triage & Majority, Heuristic, GBDT, LLM & Macro-F1, TP Miss Rate, Esc. Rate \\
+E2 ATT\&CK & Pure LLM vs.\ LLM+RAG & Technique/Tactic Precision, Recall \\
+E3 SQL Inv. & Published scores, Single-turn LLM & Benchmark Reward \\
+E4 Report & No-RAG Report (50 incidents) & Correctness, Evidence Completeness \\
+E5 Cost & --- & Tokens/incident, Latency, Tool calls \\
+Ablation & Remove Analytics / KB / Rules & Same as E1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% A2Z T-V: Tuning, Useful Results, Verify
+\subsection{Hyperparameter Tuning and Expected Outcomes}
+All thresholds ($\tau$, $\tau_{\text{safety}}$), fusion weights ($w_{\text{ml}}$, $w_{\text{llm}}$), and tool-call budget $B$ will be tuned exclusively on the validation split. As outlined in Table~\ref{tab:eval_plan}, we expect the hybrid agent to: (1) achieve a lower TP miss rate than standalone GBDT and unaugmented LLM baselines; (2) trace a tunable Pareto frontier between miss rate and human escalation rate; and (3) improve ATT\&CK mapping accuracy and report auditability.

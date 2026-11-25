@@ -1,0 +1,107 @@
+\section{Proposed System Design}
+
+%% A2Z PA-PE: Aim, Based on, Design, Paper Elements (8 Modules)
+To satisfy both low miss rates and verifiable human-in-the-loop oversight, we design an eight-module hybrid architecture (Fig.~\ref{fig:arch}):
+\begin{enumerate}
+    \item \textbf{User / Scenario}: Tier-1 SOC analysts reviewing queued incidents and escalation recommendations.
+    \item \textbf{Query / Input}: Validates structured incident IDs, alert batches, or natural-language queries into a unified \texttt{TriageRequest}.
+    \item \textbf{Planner \& Reasoning Agent}: An LLM ReAct planner that decomposes tasks, invokes tools under budget $B$, and evaluates evidence sufficiency.
+    \item \textbf{Data Acquisition / Retrieval}: DuckDB-backed Incident Evidence Store (GUIDE) and read-only SQL Log Query Tool (ExCyTIn-Bench), tagging every record with provenance.
+    \item \textbf{Analytics Engine}: LightGBM classifier outputting calibrated posteriors $p = (p_{\text{TP}}, p_{\text{BP}}, p_{\text{FP}})$, SHAP attributions $\phi$, and $k$-nearest historical incidents.
+    \item \textbf{Domain Knowledge Integration}: Chroma vector store indexing MITRE ATT\&CK STIX 2.1 (432 techniques) and NIST SP 800-61 Rev.~3 playbooks, plus deterministic high-risk rules (R1--R5).
+    \item \textbf{Decision / Recommendation}: Evidence fusion engine combining $p$, LLM rationale, and rules R1--R5 to emit \texttt{AUTO\_TRIAGED} or \texttt{NEEDS\_HUMAN\_REVIEW}.
+    \item \textbf{Output \& Interaction}: Structured JSON/Markdown audit report with evidence chains and SHAP plots rendered in Streamlit.
+\end{enumerate}
+
+%% A2Z PG: Graph (TikZ Architecture Diagram)
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    node distance=0.55cm and 0.45cm,
+    box/.style={draw, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt, minimum width=1.9cm, minimum height=0.65cm},
+    db/.style={draw, cylinder, shape border rotate=90, aspect=0.25, align=center, font=\scriptsize, inner sep=2pt, minimum width=1.5cm}
+]
+\node[box] (user) {1. User\\SOC Analyst};
+\node[box, right=of user] (query) {2. Query\\TriageRequest};
+\node[box, right=of query] (planner) {3. Planner\\LLM ReAct};
+
+\node[box, below=of query] (data) {4. Data Retr.\\DuckDB / SQL};
+\node[box, below=of planner] (analytics) {5. Analytics\\GBDT + SHAP};
+\node[box, right=of analytics] (kb) {6. Domain KB\\ATT\&CK + Rules};
+
+\node[box, below=of data] (decision) {7. Decision\\FuseEvidence};
+\node[box, right=of decision] (output) {8. Output\\Audit Report};
+
+\draw[-{Stealth[scale=0.8]}] (user) -- (query);
+\draw[-{Stealth[scale=0.8]}] (query) -- (planner);
+\draw[<->, >={Stealth[scale=0.8]}] (planner) -- (data);
+\draw[<->, >={Stealth[scale=0.8]}] (planner) -- (analytics);
+\draw[<->, >={Stealth[scale=0.8]}] (planner) -- (kb);
+\draw[-{Stealth[scale=0.8]}] (planner.south) |- (decision.east);
+\draw[-{Stealth[scale=0.8]}] (decision) -- (output);
+\draw[-{Stealth[scale=0.8]}, dashed] (output.south) -- ++(0,-0.25) -| (user.south);
+\end{tikzpicture}
+\caption{Eight-module architecture of the AI SOC Analyst Agent.}
+\label{fig:arch}
+\end{figure}
+
+%% A2Z PF, PH, PI, PM: Formulation, Implementation, Logic
+\subsection{Evidence Fusion and Escalation Logic}
+Algorithm~\ref{alg:triage} orchestrates the bounded ReAct evidence-gathering loop (lines 5--9), analytics/RAG invocation (lines 10--16), and escalation gating (line 18). Crucially, \texttt{Planner.IsSufficient(E)} is enforced deterministically—requiring evidence for every alert, entity context, and verification that empty SQL results are not caused by telemetry outages (M1: Assume Breach).
+
+\begin{algorithm}[t]
+\caption{SOC Triage Agent}
+\label{alg:triage}
+\scriptsize
+\begin{algorithmic}[1]
+\REQUIRE Request $Q$, model $M$, KB, playbooks $PB$, threshold $\tau$, budget $B$
+\ENSURE Triage report $R$
+\STATE $req \leftarrow \text{ValidateAndParse}(Q)$
+\IF{$req$ is invalid} \RETURN $\text{ErrorReport}$ \ENDIF
+\STATE $plan \leftarrow \text{Planner.Decompose}(req)$; $E \leftarrow \emptyset$; $calls \leftarrow 0$
+\REPEAT
+    \STATE $tool \leftarrow \text{Planner.SelectTool}(plan, E)$
+    \STATE $E \leftarrow E \cup tool.\text{Execute}(req, E)$
+    \STATE $calls \leftarrow calls + 1$
+\UNTIL{$\text{Planner.IsSufficient}(E)$ \OR $calls \ge B$}
+\STATE $x \leftarrow \text{ExtractFeatures}(E)$; $p \leftarrow M.\text{PredictProba}(x)$
+\STATE $\phi \leftarrow \text{SHAP}(M, x)$; $S \leftarrow \text{RetrieveSimilar}(x, k)$
+\STATE $T \leftarrow \text{MapToATTACK}(E, KB)$; $K \leftarrow KB(T) \cup PB(T)$
+\STATE $llm \leftarrow \text{LLM.Reason}(E, p, \phi, S, T, K)$
+\STATE $(label, conf, flags) \leftarrow \text{FuseEvidence}(p, llm, \text{Rules}(T))$
+\IF{$conf < \tau$ \OR $\text{"conflict"} \in flags$ \OR $\text{"high\_risk"} \in flags$ \OR $\neg\text{IsSufficient}(E)$}
+    \STATE $R.\text{status} \leftarrow \text{"NEEDS\_HUMAN\_REVIEW"}$
+\ELSE
+    \STATE $R.\text{status} \leftarrow \text{"AUTO\_TRIAGED"}$
+\ENDIF
+\STATE $R.\text{actions} \leftarrow PB.\text{Recommend}(label, T)$
+\RETURN $R$
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:fusion} converts the LLM's discrete confidence (Low=0.5, Med=0.7, High=0.9) into a probability vector $q$ and computes the weighted fusion score:
+\begin{equation}
+s = w_{\text{ml}} \cdot p + w_{\text{llm}} \cdot q, \quad w_{\text{ml}} + w_{\text{llm}} = 1.
+\label{eq:fusion}
+\end{equation}
+To operationalize asymmetric error costs (M3), if any high-risk kill-chain rule (e.g., R2: credential access followed by lateral movement) triggers and $p_{\text{TP}} \ge \tau_{\text{safety}}$, the label is overridden to \texttt{TP} and flagged for mandatory human review.
+
+\begin{algorithm}[t]
+\caption{FuseEvidence}
+\label{alg:fusion}
+\scriptsize
+\begin{algorithmic}[1]
+\REQUIRE ML probabilities $p$, LLM output $llm$, rule results $U$, weights $w_{\text{ml}}, w_{\text{llm}}$
+\ENSURE $(label, conf, flags)$
+\STATE $flags \leftarrow \emptyset$
+\STATE $q \leftarrow \text{OneHotWithConfidence}(llm.\text{label}, llm.\text{confidence})$
+\STATE $s \leftarrow w_{\text{ml}} \cdot p + w_{\text{llm}} \cdot q$
+\STATE $label \leftarrow \arg\max(s)$; $conf \leftarrow \max(s)$
+\IF{$\arg\max(p) \neq llm.\text{label}$} \STATE $flags \leftarrow flags \cup \{\text{"conflict"}\}$ \ENDIF
+\IF{$U$ contains a high-risk pattern}
+    \STATE $flags \leftarrow flags \cup \{\text{"high\_risk"}\}$
+    \IF{$label \neq \text{TP}$ \AND $p_{\text{TP}} \ge \tau_{\text{safety}}$} \STATE $label \leftarrow \text{TP}$ \ENDIF
+\ENDIF
+\RETURN $(label, conf, flags)$
+\end{algorithmic}
+\end{algorithm}

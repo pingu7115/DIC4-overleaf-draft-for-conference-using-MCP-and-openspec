@@ -1,51 +1,22 @@
-\documentclass[12pt,onecolumn]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{cite}
-
-\title{AI SOC Analyst Agent for Security Incident Triage}
-\author{Group 16}
+\documentclass[conference]{IEEEtran}
+\input{preamble}
 
 \begin{document}
+
+\title{AI SOC Analyst Agent: An Evidence-Grounded and Escalation-Aware Hybrid Framework for Security Incident Triage}
+
+\input{authors}
+
 \maketitle
 
-\begin{abstract}
-%% ERROR 1: Missing Checkpoint B (But/Challenge), Missing Checkpoint E (Experiments), Missing IEEEkeywords
-%% ERROR 2: Unescaped '%' truncates the line in LaTeX!
-Modern SOCs face massive cyberattacks where true positives are below 5% of daily alerts.
-%% ERROR 3: Fabricated experimental numbers in Proposal stage (violates openspec/config.yaml)
-We propose the AI SOC Analyst Agent combining GBDT, MITRE ATT\&CK, and LLM reasoning. Our experiments show that the system achieves 96.8% Macro-F1 and reduces the miss rate to 0.4% across all benchmarks.
-\end{abstract}
+\input{sections/00_abstract}
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_proposed_design}
+\input{sections/04_experiment}
+\input{sections/05_conclusion}
 
-\section{Introduction}
-Enterprise SOCs suffer from alert fatigue \cite{unknown_ref_2026}. As shown in Fig.~\ref{fig:missing_arch}, our system solves this problem.
-
-\section{Related Work}
-Prior methods \cite{freitas2024} use GBDT without LLM reasoning.
-
-\section{Proposed Design}
-We fuse ML probability $p$ and LLM output $q$ using $s = w_{ml} p + w_{llm} q$.
-%% ERROR 4: Algorithm 2 omits safety relabeling guard (\tau_safety) required by NFR2 / M3
-Note that the final label is simply $\arg\max(s)$ without any high-risk safety relabeling.
-
-%% ERROR 5: IEEE style requires table caption ABOVE the table, not below
-\begin{table}[h]
-\centering
-\begin{tabular}{ll}
-\hline
-Experiment & Result \\
-\hline
-E1 Triage & 96.8\% F1 (fabricated) \\
-\hline
-\end{tabular}
-\caption{Flawed Table with Caption Below and Fabricated Data}
-\end{table}
-
-\section{Conclusion}
-We presented an AI SOC Analyst Agent.
-
-\begin{thebibliography}{9}
-\bibitem{freitas2024} S. Freitas et al., ``AI-Driven Guided Response for Security Operation Centers,'' 2024.
-\end{thebibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 
 \end{document}

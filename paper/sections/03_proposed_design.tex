@@ -16,6 +16,7 @@ To satisfy both low miss rates and verifiable human-in-the-loop oversight, we de
 %% A2Z PG: Graph (TikZ Architecture Diagram)
 \begin{figure}[t]
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tikzpicture}[
     node distance=0.55cm and 0.45cm,
     box/.style={draw, rounded corners=2pt, align=center, font=\scriptsize, inner sep=3pt, minimum width=1.9cm, minimum height=0.65cm},
@@ -40,14 +41,15 @@ To satisfy both low miss rates and verifiable human-in-the-loop oversight, we de
 \draw[-{Stealth[scale=0.8]}] (planner.south) |- (decision.east);
 \draw[-{Stealth[scale=0.8]}] (decision) -- (output);
 \draw[-{Stealth[scale=0.8]}, dashed] (output.south) -- ++(0,-0.25) -| (user.south);
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \caption{Eight-module architecture of the AI SOC Analyst Agent.}
 \label{fig:arch}
 \end{figure}
 
 %% A2Z PF, PH, PI, PM: Formulation, Implementation, Logic
 \subsection{Evidence Fusion and Escalation Logic}
-Algorithm~\ref{alg:triage} orchestrates the bounded ReAct evidence-gathering loop (lines 5--9), analytics/RAG invocation (lines 10--16), and escalation gating (line 18). Crucially, \texttt{Planner.IsSufficient(E)} is enforced deterministically—requiring evidence for every alert, entity context, and verification that empty SQL results are not caused by telemetry outages (M1: Assume Breach).
+Algorithm~\ref{alg:triage} orchestrates the bounded ReAct evidence-gathering loop (lines 5--9), analytics/RAG invocation (lines 10--16), and escalation gating (line 18). Crucially, \texttt{Planner.\allowbreak IsSufficient(E)} is enforced deterministically—requiring evidence for every alert, entity context, and verification that empty SQL results are not caused by telemetry outages (M1: Assume Breach).
 
 \begin{algorithm}[t]
 \caption{SOC Triage Agent}

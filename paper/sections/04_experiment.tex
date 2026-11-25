@@ -11,18 +11,19 @@ In accordance with proposal-stage academic integrity, no experimental results ar
 \centering
 \caption{Planned Evaluation Matrix (E1--E5 and Ablation)}
 \label{tab:eval_plan}
-\begin{tabular}{@{}lll@{}}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}l>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X@{}}
 \toprule
 \textbf{Exp.} & \textbf{Baselines} & \textbf{Primary Metrics} \\
 \midrule
-E1 Triage & Majority, Heuristic, GBDT, LLM & Macro-F1, TP Miss Rate, Esc. Rate \\
+E1 Triage & Majority, Heuristic, GBDT, LLM & Macro-F1, TP Miss Rate, Esc.\ Rate \\
 E2 ATT\&CK & Pure LLM vs.\ LLM+RAG & Technique/Tactic Precision, Recall \\
 E3 SQL Inv. & Published scores, Single-turn LLM & Benchmark Reward \\
 E4 Report & No-RAG Report (50 incidents) & Correctness, Evidence Completeness \\
 E5 Cost & --- & Tokens/incident, Latency, Tool calls \\
 Ablation & Remove Analytics / KB / Rules & Same as E1 \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 %% A2Z T-V: Tuning, Useful Results, Verify
